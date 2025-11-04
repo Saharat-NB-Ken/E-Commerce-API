@@ -1,0 +1,10 @@
+Prisma schema loaded from prisma/schema.prisma
+Datasource "db": MySQL database "e_commerce_db" at "localhost:3306"
+
+Already in sync, no schema change or pending migration was found.
+
+Running generate... (Use --skip-generate to skip the generators)
+[2K[1A[2K[GRunning generate... - Prisma Client
+[2K[1A[2K[G✔ Generated Prisma Client (v6.16.2) to ./node_modules/@prisma/client in 110ms
+
+

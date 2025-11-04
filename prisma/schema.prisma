@@ -1,0 +1,216 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+// -----------------------
+// Role
+// -----------------------
+enum Role {
+  USER
+  MERCHANT
+  ADMIN
+}
+
+// -----------------------
+// Users
+// -----------------------
+model User {
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+  role     Role   @default(USER)
+
+  cart     Cart?
+  orders   Order[]
+  products Product[]
+  notifications Notification[]  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+
+// -----------------------
+// ProductStats
+// -----------------------
+model ProductStats {
+  id        Int      @id @default(autoincrement())
+  productId Int      @unique
+  product   Product  @relation(fields: [productId], references: [id], name: "ProductStatsRelation")
+  views     Int      @default(0)
+  sold      Int      @default(0)
+  revenue   Float    @default(0)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Category {
+  id        Int       @id @default(autoincrement())
+  name      String    @unique
+  products  Product[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Product {
+  id          Int            @id @default(autoincrement())
+  name        String
+  description String?
+  price       Float
+  stock       Int         @default(0)
+  ownerId     Int
+  merchant    User        @relation(fields: [ownerId], references: [id])
+  cartItems   CartItem[]
+  orderItems  OrderItem[]
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  stats       ProductStats? @relation("ProductStatsRelation")
+  images      ProductImage[]
+  categoryId  Int
+  category    Category     @relation(fields: [categoryId], references: [id])
+}
+
+model ProductImage {
+  id        Int      @id @default(autoincrement())
+  productId Int
+  name      String
+  url       String @db.LongText
+  isMain    Boolean  @default(false) // true = รูปหลัก
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+}
+
+// -----------------------
+// Carts
+// -----------------------
+model Cart {
+  id        Int        @id @default(autoincrement())
+  userId    Int        @unique
+  user      User       @relation(fields: [userId], references: [id])
+  items     CartItem[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model CartItem {
+  id        Int      @id @default(autoincrement())
+  cartId    Int
+  productId Int
+  quantity  Int      @default(1)
+  cart      Cart     @relation(fields: [cartId], references: [id])
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade) // ✅
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([cartId, productId])
+}
+
+// -----------------------
+// Orders
+// -----------------------
+enum OrderStatus {
+  PENDING
+  COMPLETED
+  CANCELED
+}
+
+model Order {
+  id        Int         @id @default(autoincrement())
+  userId    Int
+  user      User        @relation(fields: [userId], references: [id])
+  status    OrderStatus @default(COMPLETED)
+  items     OrderItem[]
+  total     Float       @default(0)
+  payment   Payment?
+  deliveries Delivery[]
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  isDeleted Boolean     @default(false)
+  deletedAt DateTime? 
+}
+
+model OrderItem {
+  id        Int     @id @default(autoincrement())
+  orderId   Int
+  productId Int
+  quantity  Int     @default(1)
+  price     Float
+  order     Order   @relation(fields: [orderId], references: [id])
+  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade) // ✅
+}
+
+// -----------------------
+// Payments
+// -----------------------
+enum PaymentStatus {
+  PENDING
+  PAID
+  FAILED
+  REFUNDED
+}
+
+model Payment {
+  id        Int           @id @default(autoincrement())
+  orderId   Int           @unique
+  order     Order         @relation(fields: [orderId], references: [id])
+  method    String        // e.g. "Credit Card", "Paypal"
+  amount    Float
+  status    PaymentStatus @default(PENDING)
+  paidAt    DateTime?
+  createdAt DateTime      @default(now())
+}
+
+// -----------------------
+// Notifications
+// -----------------------
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  message   String
+  read      Boolean  @default(false)
+  createdAt DateTime @default(now())
+}
+
+
+
+// ------------------------
+// Delivery
+// ------------------------
+
+
+model Delivery {
+  id          Int       @id @default(autoincrement())
+  orderId     Int
+  order       Order     @relation(fields: [orderId], references: [id])
+  
+  recipient   String    // ชื่อผู้รับ
+  address     String    // ที่อยู่จัดส่ง
+  city        String?
+  postalCode  String?
+  country     String?
+  
+  carrier     String?   // เช่น "Kerry", "DHL", "FedEx"
+  trackingNo  String?   // เลขพัสดุสำหรับ tracking
+  status      String    @default("PENDING") // PENDING, SHIPPED, DELIVERED, CANCELED
+  
+  shippedAt   DateTime?
+  deliveredAt DateTime?
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@index([orderId])
+}
