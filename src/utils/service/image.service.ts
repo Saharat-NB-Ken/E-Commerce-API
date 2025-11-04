@@ -20,10 +20,6 @@ export const uploadSingleImage = async (
   image: string,
   folder: string = "products"
 ): Promise<{ url: string; name: string }> => {
-  console.log("cloud name", process.env.CLOUDINARY_NAME);
-  console.log("api key", process.env.API_KEY);
-  console.log("api secret", process.env.API_SECRET);
-
   if (!image) throw ApiError.badRequest("Image is required");
 
   const result = await cloudinary.uploader.upload(image, {

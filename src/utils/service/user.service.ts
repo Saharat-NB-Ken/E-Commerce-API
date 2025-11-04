@@ -40,7 +40,6 @@ export const changePassword = async (
     }
 
     const user = await userModel.getUserById(userId);
-    console.log("user id", user?.password);
 
     if (!user) throw ApiError.notFound("User not found");
 

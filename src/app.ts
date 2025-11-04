@@ -24,9 +24,17 @@ import { errorHandler } from "./middlewares/error.middleware";
 import { setupUserOrderSwagger } from "./config/swagger/user/order.swager";
 import bodyParser from "body-parser";
 import { setupPaymentManagementSwagger } from "./config/swagger/admin/payment.swagger";
+import rateLimit from "express-rate-limit";
 
 const app = express();
 
+const globalLimiter = rateLimit({
+  windowMs: 10 * 60 * 1000, // 10 นาที
+  max: 200, // 200 requests ต่อ 10 นาที ต่อ IP
+  message: "Too many requests from this IP, please try again later.",
+});
+
+app.use(globalLimiter);
 app.use(bodyParser.json({ limit: '10mb' }));
 app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 // Middlewares
