@@ -6,7 +6,6 @@ import userRoutes from "./routes/user/user.route";
 import authRoutes from "./routes/auth.route";
 import productRoutes from "./routes/product.route";
 import cartRoutes from "./routes/user/cart.route";
-import emailRoutes from "./routes/email.route";
 import adminDashboardRoutes from "./routes/admin/adminDashboard.route";
 import adminProductManagementRoutes from "./routes/admin/adminProductManagement.route"
 import userDashboardRoutes from "./routes/user/userDashboard.route";
@@ -29,8 +28,8 @@ import rateLimit from "express-rate-limit";
 const app = express();
 
 const globalLimiter = rateLimit({
-  windowMs: 10 * 60 * 1000, // 10 นาที
-  max: 200, // 200 requests ต่อ 10 นาที ต่อ IP
+  windowMs: 10 * 60 * 1000, // 10 minutes
+  max: 200, // 200 requests for 10 minutes per IP
   message: "Too many requests from this IP, please try again later.",
 });
 
@@ -48,7 +47,6 @@ app.use("/api/users", userRoutes);
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/cart", cartRoutes);
-app.use("/api/email", emailRoutes);
 app.use("/api/admin-dashboard", adminDashboardRoutes);
 app.use("/api/admin-product-management", adminProductManagementRoutes);
 app.use("/api/admin-order-management", adminOrderManagementRoutes)
@@ -74,5 +72,6 @@ app.listen(3000, () => {
   console.log("Swagger docs available at http://localhost:3000/api-docs");
 });
 
-
 export default app;
+
+
