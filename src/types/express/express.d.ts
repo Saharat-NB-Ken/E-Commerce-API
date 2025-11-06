@@ -1,11 +1,11 @@
-import { UserRole } from "../dtos/roles.dto";
+export {};
 
 declare global {
   namespace Express {
     interface Request {
       user?: {
         id: number;
-        role: UserRole;
+        role: string;
       };
     }
   }
