@@ -18,6 +18,12 @@
       "./src/types"
     ],
     "noImplicitAny": true,
+    "baseUrl": "src",
+    "paths": {
+      "@/*": [
+        "*"
+      ]
+    }
   },
   "include": [
     "src/**/*",
