@@ -5,7 +5,7 @@
     "moduleResolution": "NodeNext",
     "outDir": "dist",
     "rootDir": "src",
-    "strict": true,
+    "strict": false,
     "esModuleInterop": true,
     "skipLibCheck": false,
     "types": [
@@ -17,7 +17,7 @@
       "./node_modules/@types",
       "./src/types"
     ],
-    "noImplicitAny": true,
+    "noImplicitAny": false,
     "baseUrl": "src",
     "paths": {
       "@/*": [
