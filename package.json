@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon --watch src --exec ts-node --type-check src/server.ts",
+    "dev": "nodemon --watch src --exec ts-node src/server.ts",
     "build": "tsc",
     "postinstall": "prisma generate",
     "migrate": "prisma migrate dev",
@@ -37,6 +37,7 @@
     "morgan": "^1.10.1",
     "multer": "^2.0.2",
     "nodemailer": "^7.0.6",
+    "prisma": "^6.19.0",
     "stripe": "^19.1.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1"
@@ -63,6 +64,7 @@
     "nodemailer": "^7.0.6",
     "stripe": "^19.1.0",
     "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1"
+    "swagger-ui-express": "^5.0.1",
+    "prisma": "^6.19.0"
   }
 }
