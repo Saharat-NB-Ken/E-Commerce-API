@@ -27,6 +27,8 @@ export const addCartItemController = async (req: Request, res: Response, next: N
 
 export const setCartItemQuantityController = async (req: Request, res: Response, next: NextFunction) => {
   try {
+    console.log(",,,,l,l,l,l,l,l,l");
+    
     const userId = getIdFromHeader(req);
     const item = await cartService.setCartItemQuantity(userId, req.body);
     res.json(item);

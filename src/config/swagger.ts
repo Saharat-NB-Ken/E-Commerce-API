@@ -13,6 +13,7 @@ const globalSecurity = {
 export const setupSwagger = (app: Express) => {
   // ========== USER ==========
   const userOptions: swaggerJsdoc.Options = {
+    
     definition: {
       openapi: "3.0.0",
       info: {

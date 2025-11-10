@@ -26,28 +26,39 @@ export const addOrUpdateCartItem = async (userId: number, data: AddCartItemDto) 
 
   if (quantity <= 0) throw ApiError.badRequest("Quantity must be greater than 0");
 
-  // 1️⃣ สร้าง cart ถ้า user ยังไม่มี
+  // 1️⃣ สร้าง cart ถ้ายังไม่มี
   const cart = await cartModel.createCartIfNotExist(userId);
 
-  // 2️⃣ ตรวจสอบว่าผลิตภัณฑ์มีอยู่ไหม
+  // 2️⃣ ตรวจสอบสินค้า
   const product = await prisma.product.findUnique({ where: { id: productId } });
   if (!product) throw ApiError.notFound("Product not found");
 
-  // 3️⃣ ตรวจสอบว่า cart item มีอยู่หรือยัง
+  // 3️⃣ ตรวจสอบ stock ก่อน (กรณีเพิ่มครั้งแรก)
+  if (quantity > product.stock) {
+    throw ApiError.badRequest(`Not enough stock. Available: ${product.stock}`);
+  }
+
+  // 4️⃣ ตรวจว่ามีสินค้าใน cart แล้วหรือยัง
   const existingItem = await cartModel.findCartItem(cart.id, productId);
 
-  const newQuantity = (existingItem?.quantity ?? 0) + quantity;
+  // ✅ คำนวณจำนวนใหม่ให้แน่นอน
+  const currentQuantity = existingItem ? existingItem.quantity : 0;
+  const newQuantity = currentQuantity + quantity;
 
-  // 4️⃣ ตรวจสอบ stock
-  if (newQuantity > product.stock) throw ApiError.badRequest("Not enough stock");
+  // 5️⃣ ตรวจ stock อีกครั้ง (กรณีรวมจำนวนเกิน)
+  if (newQuantity > product.stock) {
+    throw ApiError.badRequest(`Not enough stock. Available: ${product.stock}`);
+  }
 
-  // 5️⃣ สร้างหรืออัปเดต cart item
+  // 6️⃣ อัปเดตหรือสร้างใหม่
   if (existingItem) {
     return cartModel.updateCartItemQuantity(existingItem.id, newQuantity);
   } else {
+    // ✅ กรณีเพิ่มครั้งแรกจำนวนมากกว่า 1 → ผ่านตรงนี้ได้แน่ ๆ
     return cartModel.createCartItem(cart.id, { productId, quantity });
   }
 };
+
 //increment cart item
 export const incrementCartItem = async (cartItemId: number, amount: number) => {
   if (!cartItemId) throw ApiError.notFound("User id not found");
@@ -62,7 +73,11 @@ export const decrementCartItem = async (cartItemId: number, amount: number) => {
 
 //set cart item quantity
 export const setCartItemQuantity = async (cartItemId: number, quantity: number) => {
+  console.log("123213232131");
+  
   if (quantity < 0) throw ApiError.badRequest("Quantity cannot be negative");
+  console.log("xcxczxcxzcx");
+  
   return cartModel.setQuantity(cartItemId, quantity);
 }
 

@@ -73,7 +73,7 @@ router.post("/", authorize(UserRole.USER), joiValidate(addCartItemSchema), addCa
  *       200:
  *         description: Cart item quantity updated
  */
-router.patch("/set", authorize(UserRole.USER), joiValidate(updateCartItemSchema), addCartItemController);
+router.patch("/set", authorize(UserRole.USER), joiValidate(updateCartItemSchema), setCartItemQuantityController);
 
 /**
  * @openapi
